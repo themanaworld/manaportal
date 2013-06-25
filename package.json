@@ -1,0 +1,14 @@
+{
+    "name": "manaportal",
+    "version": "0.0.1",
+    "description": "An HTML5 content workshop for The Mana World, soon to be a full HTML5 client for The Mana World's tmwAthena server.",
+    "devDependencies": {
+        "smash": "~0.0.8",
+        "uglify-js": "2.2.x",
+        "vows": "0.7.x",
+        "jsdom": "0.5.x"
+    },
+    "scripts": {
+        "test": "node_modules/vows/bin/vows --spec 'test/*/*.js$'"
+    }
+}
