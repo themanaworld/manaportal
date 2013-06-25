@@ -2,7 +2,8 @@
 process.env.TZ = "UTC";
 
 var smash = require("smash"),
-    jsdom = require("jsdom");
+    jsdom = require("jsdom"),
+    Canvas = require("canvas");
 
 module.exports = function() {
     var files = [].slice.call(arguments).map(function(d) { return "public/js/" + d; }),
@@ -40,10 +41,16 @@ module.exports = function() {
             };
         };
 
+        document.createCanvas = function() {
+            return new Canvas();
+        }
+
         sandbox = {
             console: console,
             document: document,
             window: document.createWindow(),
+            Canvas: Canvas,
+            Image: Canvas.Image
         };
 
         return topic;

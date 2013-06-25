@@ -7,7 +7,7 @@ var suite = vows.describe("mp.dye");
 
 suite.addBatch({
     "The manaportal dye": {
-        topic: load("mp/dye").expression("mp.dye"),
+        topic: load("mp/dye").expression("mp.dye").document(),
         "getChannel": {
             topic: function(dye) { return dye.getChannel; },
             "returns null given pure black": function(f) {

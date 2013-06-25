@@ -2,14 +2,9 @@
 var vows = require("vows"),
     load = require("../load"),
     assert = require("assert"),
-    jsdom = require("jsdom"),
-    Canvas = require("canvas"),
-    Image = Canvas.Image;
+    jsdom = require("jsdom");
 
 var suite = vows.describe("mp.dye");
-
-var canvas = new Canvas(32,32);
-var context = canvas.getContext("2d");
 
 var dyeString = "R:#ede5b2,fff7bf;G:#cccccc,ffffff";
 var dyeData = {
@@ -23,40 +18,55 @@ var dyeData = {
     ]
 };
 
-function loadImage(url, tests) {
+function assertImageDataEqual(input, expected, actual, width) {
+    assert.equal(actual.length, expected.length, "expected same " + expected.length + " pixel components, found " + actual.length);
+    for (var i = 0; i != actual.length; i += 4) {
+        var p = i / 4;
+        var y = Math.floor(p / width);
+        var x = p - y * width;
+        var msg = "At (" + x + "," + y + "): "
+                + "Input rgba(" + input   [i    ] + "," + input   [i + 1] + "," + input   [i + 2] + "," + input   [i + 3] + ") "
+        + "should dye to rgba(" + expected[i    ] + "," + expected[i + 1] + "," + expected[i + 2] + "," + expected[i + 3] + "); "
+                + "found rgba(" + actual  [i    ] + "," + actual  [i + 1] + "," + actual  [i + 2] + "," + actual  [i + 3] + ")";
+        assert.equal(actual[i    ], expected[i    ], msg);
+        assert.equal(actual[i + 1], expected[i + 1], msg);
+        assert.equal(actual[i + 2], expected[i + 2], msg);
+        assert.equal(actual[i + 3], expected[i + 3], msg);
+    }
+}
+
+function unshiftLoadImageBind(url, tests) {
     tests.topic = function() {
-        var image = new Image;
+        var mp = arguments[arguments.length - 1];
         var tester = this;
-        var callback = this.callback;
         var args = arguments;
-        image.onload = function() {
-            canvas.width = image.width;
-            canvas.height = image.height;
-            context.drawImage(image, 0, 0);
-            callback = callback.bind(tester, false, context.getImageData(0, 0, image.width, image.height));
-            callback.apply(tester, args);
-        }
-        image.onerror = function(err) {
-            throw new Error("Error loading '" + url + "': " + err);
-        }
-        image.src = url;
+        mp.resource.loadImage(url, function(err, data) {
+            if (err) {
+                throw new Error("Error loading '" + url + "': " + data);
+            }
+            tester.callback.bind(tester, err, data).apply(tester, args);
+        });
     };
     return tests;
 }
 
 suite.addBatch({
     "The manaportal dye": {
-        topic: load("mp/dye").expression("mp.dye").document(),
+        topic: load("mp/dye", "mp/resource").expression("mp").document(),
         "parseDyeString": {
-            "Extracts a the dye channel data from the dyestring": function(dye) {
-                assert.equal(dye.parseDyeString(dyeString), dyeData);
+            "Extracts the dye channel data from the dyestring": function(mp) {
+                assert.equal(mp.dye.parseDyeString(dyeString), dyeData);
             }
         },
         "dyeImage": {
-            "with the big recolorable cake": loadImage("test/data/bigcake.png", {
-                "to the big white cake": loadImage("test/data/whitecake.png", {
-                    "dyes correctly when given the correct dye data": function(err1, whiteCake, dyeableCake, dye) {
-                        assert.deepEqual(dye.dyeImage(dyeableCake.data, dyeData), whiteCake.data);
+            "with the big recolorable cake": unshiftLoadImageBind("test/data/bigcake.png", {
+                "to the big white cake": unshiftLoadImageBind("test/data/whitecake.png", {
+                    "dyes correctly when given the correct dye data": function(err, whiteCake, dyeableCake, mp) {
+                        var input = dyeableCake.data;
+                        var expected = whiteCake.data;
+                        var actual = new Uint8ClampedArray(input);
+                        mp.dye.dyeImage(actual, dyeData);
+                        assertImageDataEqual(input, expected, actual, whiteCake.width);
                     }
                 })
             })

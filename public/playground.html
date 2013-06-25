@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+</head>
+<body>
+<canvas id="original" width="32" height="32"></canvas>
+<canvas id="dyed" width="32" height="32"></canvas>
+</body>
+
+<script src="js/mp/dye.js"></script>
+<script src="js/mp/resource.js"></script>
+<script>
+var dyeData = {
+    "R": [
+        [0xed, 0xe5, 0xb2],
+        [0xff, 0xf7, 0xbf]
+    ],
+    "G": [
+        [0xcc, 0xcc, 0xcc],
+        [0xff, 0xff, 0xff]
+    ]
+};
+mp.resource.loadImage("bigcake.png", function(err, imageData) {
+    var oContext = document.getElementById("original").getContext("2d");
+    var dContext = document.getElementById("dyed").getContext("2d");
+    oContext.putImageData(imageData, 0, 0);
+    mp.dye.dyeImage(imageData.data, dyeData);
+    dContext.putImageData(imageData, 0, 0);
+});
+</script>
+</html>
