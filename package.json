@@ -6,9 +6,10 @@
         "smash": "~0.0.8",
         "uglify-js": "2.2.x",
         "vows": "0.7.x",
-        "jsdom": "0.5.x"
+        "jsdom": "0.5.x",
+        "canvas": "1.0.x"
     },
     "scripts": {
-        "test": "node_modules/vows/bin/vows --spec 'test/*/*.js$'"
+        "test": "ls test/*/*.js | grep -v 'future\\.js$' | xargs node_modules/vows/bin/vows"
     }
 }

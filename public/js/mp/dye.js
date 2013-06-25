@@ -1,7 +1,9 @@
 "use strict";
 var mp = function(mp) {
     mp.dye = {
-        getChannel: getChannel
+        getChannel: getChannel,
+        parseDyeString: parseDyeString,
+        dyeImage: dyeImage
     };
     var channel = [null, "R", "G", "Y", "B", "M", "C", "W"];
     function getChannel(color) {
@@ -25,6 +27,12 @@ var mp = function(mp) {
         }
 
         return { channel: channel[idx], intensity: max };
+    }
+    function parseDyeString(dyeString) {
+        /* TODO */
+    }
+    function dyeImage(imageData, dyeData) {
+        /* TODO */
     }
     return mp;
 }(mp || {});
