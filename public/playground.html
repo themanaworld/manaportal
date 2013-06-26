@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
+<title>Mana Portal Playground</title>
+<script src="js/mp/dye.js"></script>
+<script src="js/mp/resource.js"></script>
 </head>
 <body>
 <canvas id="original" width="32" height="32"></canvas>
 <canvas id="dyed" width="32" height="32"></canvas>
-</body>
-
-<script src="js/mp/dye.js"></script>
-<script src="js/mp/resource.js"></script>
+<span id="dyeOut"></span>
 <script>
 var dyeString = "R:#ede5b2,fff7bf|G:#cccccc,ffffff";
 var dyeData = mp.dye.parseDyeString(dyeString);
+document.getElementById("dyeOut").innerText = mp.dye.asDyeString(dyeData);
 
-mp.resource.loadImage("bigcake.png", function(err, imageData) {
+mp.resource.loadImage("images/bigcake.png", function(err, imageData) {
     var oContext = document.getElementById("original").getContext("2d");
     var dContext = document.getElementById("dyed").getContext("2d");
     oContext.putImageData(imageData, 0, 0);
@@ -22,4 +23,5 @@ mp.resource.loadImage("bigcake.png", function(err, imageData) {
     dContext.putImageData(imageData, 0, 0);
 });
 </script>
+</body>
 </html>

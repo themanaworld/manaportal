@@ -3,6 +3,7 @@ var mp = function(mp) {
     mp.dye = {
         getChannel: getChannel,
         parseDyeString: parseDyeString,
+        asDyeString: asDyeString,
         dyeImage: dyeImage
     };
     
@@ -60,6 +61,39 @@ var mp = function(mp) {
         }
         
         return dyeData;
+    }
+    
+    /*
+     * Return a dye string matching the given dye specification.
+     */
+    function asDyeString(dye) {
+        var dyeString = "";
+        
+        // skip null channel
+        for (var i = 1; i < channel.length; i++) {
+            var dyeChannel = channel[i];
+            var dyeParts = dye[dyeChannel];
+            if (!dyeParts || dyeParts.length == 0) {
+                continue;
+            }
+            
+            dyeString += dyeChannel + ":#";
+            
+            for (var j = 0; j < dyeParts.length; j++) {
+                var color = dyeParts[j];
+                dyeString += color[0].toString(16) + color[1].toString(16) + color[2].toString(16) + ",";
+            }
+            
+            dyeString = dyeString.slice(0, -1);
+            
+            dyeString += "|";
+        }
+        
+        if (dyeString.length > 0) {
+            dyeString = dyeString.slice(0, -1);
+        }
+        
+        return dyeString;
     }
     
     /*
