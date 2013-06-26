@@ -5,7 +5,12 @@ var mp = function(mp) {
         parseDyeString: parseDyeString,
         dyeImage: dyeImage
     };
+    
     var channel = [null, "R", "G", "Y", "B", "M", "C", "W"];
+    
+    /*
+     * Return the channel and intensity for the given RGB(A) array.
+     */
     function getChannel(color) {
         var r = color[0], g = color[1], b = color[2],
             max = Math.max(r, g, b);
@@ -28,12 +33,35 @@ var mp = function(mp) {
 
         return { channel: channel[idx], intensity: max };
     }
+    
     /*
      * Return a dye specification from a dye string.
      */
     function parseDyeString(dyeString) {
-        /* TODO */
+        var channelStrings = dyeString.split("|");
+        var dyeData = {};
+        
+        for (var i = 0; i < channelStrings.length; i++) {
+            var channelStr = channelStrings[i];
+            if (channelStr[1] != ":" || channelStr[2] != "#") {
+                // TODO error
+            }
+            
+            var channel = channelStr[0];
+            var parts = channelStr.substring(3).split(",");
+            
+            var list = [];
+            
+            for (var j = 0; j < parts.length; j++) {
+                list.push(mp.resource.parseColor(parts[j]));
+            }
+            
+            dyeData[channel] = list;
+        }
+        
+        return dyeData;
     }
+    
     /*
      * Dye the internal image data based on the specification provided by dyeData.
      * The specification can be generated from a dyeString by parseDyeString.

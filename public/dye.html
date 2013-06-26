@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dyer</title>
+        <style type="text/css">
+            .viewport {
+                border:solid 1px #000000;
+                display: inline-block;
+                height: 400px;
+                overflow: scroll;
+                width: 600px;
+            }
+        </style>
+        <script src="js/mp/dye.js"></script>
+        <script src="js/mp/resource.js"></script>
+    </head>
+    <body>
+        <div class="viewport" dropzone="link" ondrop="dyeDrop(event);" ondragover="event.preventDefault();">
+            <canvas id="dyeCanvas"></canvas>
+        </div>
+        <div class="viewport" dropzone="link" ondrop="referenceDrop(event);" ondragover="event.preventDefault();"></div>
+        
+        <div style="display: none" >
+            <canvas id="rawCanvas"></canvas>
+        </div>
+        
+        <div><input type="text" id="dyeStringInput" size="100"/><button onclick="applyDye(event);">Apply</button></div>
+        
+        <script>
+            var dyeCanvas = document.getElementById("dyeCanvas"),
+                dyeStringInput = document.getElementById("dyeStringInput");
+            
+            var loadedImage = null;
+            
+            function applyDye(event) {
+                if (loadedImage == null) {
+                    return;
+                }
+                
+                var ctx = dyeCanvas.getContext("2d");
+                ctx.clearRect(0, 0, dyeCanvas.width, dyeCanvas.height);
+                var clone = mp.resource.copyImageData(ctx, loadedImage);
+                mp.dye.dyeImage(clone.data, mp.dye.parseDyeString(dyeStringInput.value));
+                ctx.putImageData(clone, 0, 0);
+            }
+            
+            function dyeDrop(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                var file = event.dataTransfer.files[0],
+                    reader = new FileReader();
+                reader.onload = function (event) {
+                    mp.resource.loadImage(event.target.result, function(err, imageData) {
+                        if (!err) {
+                            loadedImage = imageData;
+                            dyeCanvas.width = loadedImage.width;
+                            dyeCanvas.height = loadedImage.height;
+                            applyDye(null);
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+                
+                return false;
+            }
+            
+            function referenceDrop(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                var file = event.dataTransfer.files[0],
+                    reader = new FileReader();
+                reader.onload = function (event) {
+                    var img = new Image();
+                    img.src = event.target.result;
+                    referenceViewport.innerHTML = '';
+                    referenceViewport.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                return false;
+            }
+        </script>
+    </body>
+</html>

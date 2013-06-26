@@ -11,16 +11,9 @@
 <script src="js/mp/dye.js"></script>
 <script src="js/mp/resource.js"></script>
 <script>
-var dyeData = {
-    "R": [
-        [0xed, 0xe5, 0xb2],
-        [0xff, 0xf7, 0xbf]
-    ],
-    "G": [
-        [0xcc, 0xcc, 0xcc],
-        [0xff, 0xff, 0xff]
-    ]
-};
+var dyeString = "R:#ede5b2,fff7bf|G:#cccccc,ffffff";
+var dyeData = mp.dye.parseDyeString(dyeString);
+
 mp.resource.loadImage("bigcake.png", function(err, imageData) {
     var oContext = document.getElementById("original").getContext("2d");
     var dContext = document.getElementById("dyed").getContext("2d");

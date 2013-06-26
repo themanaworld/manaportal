@@ -1,7 +1,9 @@
 "use strict";
 var mp = function(mp) {
     mp.resource = {
-        loadImage: loadImage
+        loadImage: loadImage,
+        copyImageData: copyImageData,
+        parseColor: parseColor
     };
 
     /*
@@ -32,5 +34,36 @@ var mp = function(mp) {
         };
         image.src = url;
     }
+    
+    function copyImageData(ctx, src) {
+        var dst = ctx.createImageData(src.width, src.height);
+        dst.data.set(src.data);
+        return dst;
+    }
+    
+    /*
+     * Parses the given color string into an array of parts
+     */
+    function parseColor(colorString) {
+        if (colorString[0] == "#") {
+            colorString = colorString.substring(1);
+        }
+        
+        if (colorString.length == 3) {
+            var r = colorString[0] + colorString[0];
+            var g = colorString[1] + colorString[1];
+            var b = colorString[2] + colorString[2];
+            return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)]
+        }
+        
+        if (colorString.length == 6) {
+            return [parseInt(colorString.substring(0,2), 16), parseInt(colorString.substring(2,4), 16), parseInt(colorString.substring(4,6), 16)]
+        }
+        
+        // TODO others?
+        
+        return null;
+    }
+    
     return mp;
 }(mp || {});
