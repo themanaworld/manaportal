@@ -50,6 +50,14 @@ function unshiftLoadImageBind(url, tests) {
     return tests;
 }
 
+function testDye(err, dyed, dyeable, mp) {
+    var input = dyeable.data;
+    var expected = dyed.data;
+    var actual = new Uint8ClampedArray(input);
+    mp.dye.dyeImage(actual, dyeData);
+    assertImageDataEqual(input, expected, actual, dyed.width);
+}
+
 suite.addBatch({
     "The manaportal dye": {
         topic: load("mp/dye", "mp/resource").expression("mp").document(),
@@ -60,14 +68,13 @@ suite.addBatch({
         },
         "dyeImage": {
             "with the big recolorable cake": unshiftLoadImageBind("test/data/bigcake.png", {
-                "to the big white cake": unshiftLoadImageBind("test/data/whitecake.png", {
-                    "dyes correctly when given the correct dye data": function(err, whiteCake, dyeableCake, mp) {
-                        var input = dyeableCake.data;
-                        var expected = whiteCake.data;
-                        var actual = new Uint8ClampedArray(input);
-                        mp.dye.dyeImage(actual, dyeData);
-                        assertImageDataEqual(input, expected, actual, whiteCake.width);
-                    }
+                "to the big white cake dyed by TMWW": unshiftLoadImageBind("test/data/whitecake.png", {
+                    "dyes correctly when given the correct dye data": testDye
+                })
+            }),
+            "with a gradient of all channels with all intensities": unshiftLoadImageBind("test/data/gradient.png", {
+                "to a gradient of all channels with all intensities dyed by TMWW with the white cake dye": unshiftLoadImageBind("test/data/gradient-whitecakedye.png", {
+                    "dyes correctly when given the correct dye data": testDye
                 })
             })
         }
