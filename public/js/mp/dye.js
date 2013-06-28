@@ -40,7 +40,7 @@ var mp = function(mp) {
      * Return a dye specification from a dye string.
      */
     function parseDyeString(dyeString) {
-        var channelStrings = dyeString.split("|");
+        var channelStrings = dyeString.split(";");
         var dyeData = {};
 
         for (var i = 0; i < channelStrings.length; i++) {
@@ -87,7 +87,7 @@ var mp = function(mp) {
 
             dyeString = dyeString.slice(0, -1);
 
-            dyeString += "|";
+            dyeString += ";";
         }
 
         if (dyeString.length > 0) {
