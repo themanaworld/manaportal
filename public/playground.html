@@ -10,6 +10,7 @@
 <canvas id="original" width="32" height="32"></canvas>
 <canvas id="dyed" width="32" height="32"></canvas>
 <span id="dyeOut"></span>
+<img id="out"/>
 <script>
 var dyeString = "R:#ede5b2,fff7bf|G:#cccccc,ffffff";
 var dyeData = mp.dye.parseDyeString(dyeString);
@@ -21,6 +22,7 @@ mp.resource.loadImage("images/bigcake.png", function(err, imageData) {
     oContext.putImageData(imageData, 0, 0);
     mp.dye.dyeImage(imageData.data, dyeData);
     dContext.putImageData(imageData, 0, 0);
+    document.getElementById("out").src = document.getElementById("dyed").toDataURL("image/png");
 });
 </script>
 </body>
