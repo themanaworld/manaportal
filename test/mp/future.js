@@ -33,10 +33,6 @@ function unshiftLoadImageBind(url, tests) {
     return tests;
 }
 
-function testDyeParse(expected, input, mp) {
-    assert.dyeDataEqual(mp.dye.parseDyeString(input), expected);
-}
-
 function testDye(err, dyed, dyeable, mp) {
     var input = dyeable.data;
     var expected = dyed.data;
@@ -48,14 +44,6 @@ function testDye(err, dyed, dyeable, mp) {
 suite.addBatch({
     "The manaportal dye": {
         topic: load("mp/dye", "mp/resource").expression("mp").document(),
-        "parseDyeString": {
-            "extracts the dye channel data from the dyestring": testDyeParse.bind(null, dyeData, dyeString)
-        },
-        "asDyeString": {
-            "reconstructs the dyestring from the dye channel data": function(mp) {
-                assert.equal(mp.dye.asDyeString(dyeData), dyeString);
-            }
-        },
         "dyeImage": {
             "with the big recolorable cake": unshiftLoadImageBind("test/data/bigcake.png", {
                 "to the big white cake dyed by TMWW": unshiftLoadImageBind("test/data/whitecake.png", {

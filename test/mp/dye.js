@@ -5,11 +5,28 @@ var vows = require("vows"),
 
 var suite = vows.describe("mp.dye");
 
+var dyeString = "R:#ede5b2,fff7bf;G:#cccccc,ffffff";
+var dyeData = {
+    "R": [
+        [0xed, 0xe5, 0xb2],
+        [0xff, 0xf7, 0xbf]
+    ],
+    "G": [
+        [0xcc, 0xcc, 0xcc],
+        [0xff, 0xff, 0xff]
+    ]
+};
+
+
+function testDyeParse(expected, input, mp) {
+    assert.dyeDataEqual(mp.dye.parseDyeString(input), expected);
+}
+
 suite.addBatch({
     "The manaportal dye": {
-        topic: load("mp/dye").expression("mp.dye").document(),
+        topic: load("mp/dye", "mp/resource").expression("mp").document(),
         "getChannel": {
-            topic: function(dye) { return dye.getChannel; },
+            topic: function(mp) { return mp.dye.getChannel; },
             "returns null given pure black": function(f) {
                 assert.equal(f([0,0,0]).channel, null);
             },
@@ -46,7 +63,15 @@ suite.addBatch({
                 assert.equal(f([55,53,55]).channel, null);
                 assert.equal(f([0,128,254]).channel, null);
             }
-        }
+        },
+        "parseDyeString": {
+            "extracts the dye channel data from the dyestring": testDyeParse.bind(null, dyeData, dyeString)
+        },
+        "asDyeString": {
+            "reconstructs the dyestring from the dye channel data": function(mp) {
+                assert.equal(mp.dye.asDyeString(dyeData), dyeString);
+            }
+        },
     }
 });
 
