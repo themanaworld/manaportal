@@ -46,7 +46,7 @@ var mp = function(mp) {
         for (var i = 0; i < channelStrings.length; i++) {
             var channelStr = channelStrings[i];
             if (channelStr[1] != ":" || channelStr[2] != "#") {
-                // TODO error
+                console.error("parseDyeString: Expected ':#' in dyeString");
             }
 
             var channel = channelStr[0];
