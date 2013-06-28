@@ -62,8 +62,13 @@ suite.addBatch({
     "The manaportal dye": {
         topic: load("mp/dye", "mp/resource").expression("mp").document(),
         "parseDyeString": {
-            "Extracts the dye channel data from the dyestring": function(mp) {
+            "extracts the dye channel data from the dyestring": function(mp) {
                 assert.equal(mp.dye.parseDyeString(dyeString), dyeData);
+            }
+        },
+        "asDyeString": {
+            "reconstructs the dyestring from the dye channel data": function(mp) {
+                assert.equal(mp.dye.asDyeString(dyeData), dyeString);
             }
         },
         "dyeImage": {
