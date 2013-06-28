@@ -1,7 +1,7 @@
 "use strict";
 var vows = require("vows"),
     load = require("../load"),
-    assert = require("assert");
+    assert = require("../assert");
 
 var suite = vows.describe("mp.dye");
 

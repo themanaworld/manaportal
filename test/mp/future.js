@@ -1,7 +1,7 @@
 "use strict";
 var vows = require("vows"),
     load = require("../load"),
-    assert = require("assert"),
+    assert = require("../assert"),
     jsdom = require("jsdom");
 
 var suite = vows.describe("mp.dye");
@@ -18,23 +18,6 @@ var dyeData = {
     ]
 };
 
-function assertImageDataEqual(input, expected, actual, width) {
-    assert.equal(actual.length, expected.length, "expected same " + expected.length + " pixel components, found " + actual.length);
-    for (var i = 0; i != actual.length; i += 4) {
-        var p = i / 4;
-        var y = Math.floor(p / width);
-        var x = p - y * width;
-        var msg = "At (" + x + "," + y + "): "
-                + "Input rgba(" + input   [i    ] + "," + input   [i + 1] + "," + input   [i + 2] + "," + input   [i + 3] + ") "
-        + "should dye to rgba(" + expected[i    ] + "," + expected[i + 1] + "," + expected[i + 2] + "," + expected[i + 3] + "); "
-                + "found rgba(" + actual  [i    ] + "," + actual  [i + 1] + "," + actual  [i + 2] + "," + actual  [i + 3] + ")";
-        assert.equal(actual[i    ], expected[i    ], msg);
-        assert.equal(actual[i + 1], expected[i + 1], msg);
-        assert.equal(actual[i + 2], expected[i + 2], msg);
-        assert.equal(actual[i + 3], expected[i + 3], msg);
-    }
-}
-
 function unshiftLoadImageBind(url, tests) {
     tests.topic = function() {
         var mp = arguments[arguments.length - 1];
@@ -50,21 +33,23 @@ function unshiftLoadImageBind(url, tests) {
     return tests;
 }
 
+function testDyeParse(expected, input, mp) {
+    assert.dyeDataEqual(mp.dye.parseDyeString(input), expected);
+}
+
 function testDye(err, dyed, dyeable, mp) {
     var input = dyeable.data;
     var expected = dyed.data;
     var actual = new Uint8ClampedArray(input);
     mp.dye.dyeImage(actual, dyeData);
-    assertImageDataEqual(input, expected, actual, dyed.width);
+    assert.imageDataEqual(actual, expected, input, dyed.width);
 }
 
 suite.addBatch({
     "The manaportal dye": {
         topic: load("mp/dye", "mp/resource").expression("mp").document(),
         "parseDyeString": {
-            "extracts the dye channel data from the dyestring": function(mp) {
-                assert.equal(mp.dye.parseDyeString(dyeString), dyeData);
-            }
+            "extracts the dye channel data from the dyestring": testDyeParse.bind(null, dyeData, dyeString)
         },
         "asDyeString": {
             "reconstructs the dyestring from the dye channel data": function(mp) {
