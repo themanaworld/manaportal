@@ -4,6 +4,7 @@ var mp = function(mp) {
         getChannel: getChannel,
         parseDyeString: parseDyeString,
         asDyeString: asDyeString,
+        updateColor: updateColor,
         dyeImage: dyeImage
     };
 
@@ -97,6 +98,36 @@ var mp = function(mp) {
         return dyeString;
     }
 
+    function updateColor(color, p) {
+        var channel = getChannel(color);
+        var channelId = channel.channel;
+        var intensity = channel.intensity;
+
+        // If this is an unknown dye channel, an empty dye channel, not a pure color, or black, skip it
+        if (!channelId || !(channelId in dyeData) || !dyeData[channelId].length || intensity == 0) {
+            return;
+        }
+
+        // Scale the intensity from 0-255 to the palette size (i is the palette index, t is the remainder)
+        var val = intensity * dyeData[channelId].length
+        var i = Math.floor(val / 255);
+        var t = val - i * 255;
+
+        // If we exactly hit one of the palette colors, just use it
+        if (!t) {
+            --i;
+            color[p    ] = dyeData[channelId][i][0];
+            color[p + 1] = dyeData[channelId][i][1];
+            color[p + 2] = dyeData[channelId][i][2];
+            return;
+        }
+
+        // If we're between two palette colors, interpolate between them (the first color in a palette is implicitly black)
+        color[p    ] = Math.floor(((255 - t) * (i && dyeData[channelId][i - 1][0]) + t * dyeData[channelId][i][0]) / 255);
+        color[p + 1] = Math.floor(((255 - t) * (i && dyeData[channelId][i - 1][1]) + t * dyeData[channelId][i][1]) / 255);
+        color[p + 2] = Math.floor(((255 - t) * (i && dyeData[channelId][i - 1][2]) + t * dyeData[channelId][i][2]) / 255);
+    }
+
     /*
      * Dye the internal image data based on the specification provided by dyeData.
      * The specification can be generated from a dyeString by parseDyeString.
@@ -112,33 +143,7 @@ var mp = function(mp) {
                 continue;
             }
 
-            var channel = getChannel(pixel);
-            var channelId = channel.channel;
-            var intensity = channel.intensity;
-
-            // If this is an unknown dye channel, an empty dye channel, not a pure color, or black, skip it
-            if (!channelId || !(channelId in dyeData) || !dyeData[channelId].length || intensity == 0) {
-                continue;
-            }
-
-            // Scale the intensity from 0-255 to the palette size (i is the palette index, t is the remainder)
-            var val = intensity * dyeData[channelId].length
-            var i = Math.floor(val / 255);
-            var t = val - i * 255;
-
-            // If we exactly hit one of the palette colors, just use it
-            if (!t) {
-                --i;
-                imageData[p    ] = dyeData[channelId][i][0];
-                imageData[p + 1] = dyeData[channelId][i][1];
-                imageData[p + 2] = dyeData[channelId][i][2];
-                continue;
-            }
-
-            // If we're between two palette colors, interpolate between them (the first color in a palette is implicitly black)
-            imageData[p    ] = ((255 - t) * (i && dyeData[channelId][i - 1][0]) + t * dyeData[channelId][i][0]) / 255;
-            imageData[p + 1] = ((255 - t) * (i && dyeData[channelId][i - 1][1]) + t * dyeData[channelId][i][1]) / 255;
-            imageData[p + 2] = ((255 - t) * (i && dyeData[channelId][i - 1][2]) + t * dyeData[channelId][i][2]) / 255;
+            updateColor(imageData, p);
         }
         /* TODO */
         return imageData;

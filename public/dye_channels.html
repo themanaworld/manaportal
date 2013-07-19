@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mana Portal Playground</title>
+<script src="js/mp/dye.js"></script>
+<script src="js/mp/resource.js"></script>
+</head>
+<body>
+<canvas id="original" width="32" height="32"></canvas>
+<script>
+function checkPixel( imageData, x, y, r, g, b) {
+    var index = (x + y * imageData.width) * 4;
+    var dR = imageData.data[index++] - r;
+    var dG = imageData.data[index++] - g;
+    var dB = imageData.data[index++] - b;
+    
+    if (dR != 0 || dG != 0 || dB != 0) {
+        console.log("(" + x + ", " + y + "): " + dR + ", " + dG + "," + dB);
+    }
+}
+
+mp.resource.loadImage("images/channels.png", function(err, image) {
+    var oContext = document.getElementById("original").getContext("2d");
+    oContext.putImageData(image, 0, 0);
+    
+    console.log("Size: " + image.width + " x " + image.height);
+    
+    for (var x = 0; x != image.width; ++x) {
+        for (var y = 0; y != image.height; ++y) {
+            checkPixel(image, x, y, (~x & 1) && y, (~x & 2) && y, (~x & 4) && y);
+        }
+    }
+});
+</script>
+</body>
+</html>
